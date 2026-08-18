@@ -44,3 +44,18 @@ resource "terraform_data" "catalogue" {
      ]
   }
 }
+
+
+resource "aws_ec2_instance_state" "catalogue" {
+  instance_id = aws_instance.catalogue.id
+  state       = "stopped" # Change to "running" to start it back up
+  depends_on = [terraform_data.catalogue]
+}
+
+
+resource "aws_ami_from_instance" "catalogue" {
+  name               = "${local.common_name_suffix}-catalogue-ami"
+  source_instance_id = aws_instance.catalogue.id
+  depends_on = [aws_ec2_instance_state.catalogue]
+}
+
